@@ -4,18 +4,15 @@ import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { X, Trash2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import type { Payment, Student } from "@/types/database";
-
-type PaymentWithStudent = Payment & { students: Pick<Student, "name"> };
 
 interface Props {
-  payment: PaymentWithStudent | null;
+  payment: any;
   onClose: () => void;
   onSaved: () => void;
 }
 
 export default function PaymentModal({ payment, onClose, onSaved }: Props) {
-  const [students, setStudents] = useState<Student[]>([]);
+  const [students, setStudents] = useState<any[]>([]);
   const [form, setForm] = useState({
     student_id: payment?.student_id || "",
     amount: payment?.amount?.toString() || "",
@@ -35,8 +32,7 @@ export default function PaymentModal({ payment, onClose, onSaved }: Props) {
     if (!form.student_id) return alert("학생을 선택해주세요");
     if (!form.amount) return alert("금액을 입력해주세요");
     setSaving(true);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const payload: any = {
+    const payload = {
       student_id: form.student_id,
       amount: parseInt(form.amount),
       payment_date: form.payment_date,
@@ -46,7 +42,7 @@ export default function PaymentModal({ payment, onClose, onSaved }: Props) {
     if (payment) {
       await supabase.from("payments").update(payload).eq("id", payment.id);
     } else {
-      await supabase.from("payments").insert(payload);
+      await supabase.from("payments").insert([payload]);
     }
     setSaving(false);
     onSaved();
@@ -77,8 +73,7 @@ export default function PaymentModal({ payment, onClose, onSaved }: Props) {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">금액 (원)</label>
             <input type="number" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })}
-              placeholder="50000"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500" />
+              placeholder="50000" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">결제일</label>
@@ -96,16 +91,13 @@ export default function PaymentModal({ payment, onClose, onSaved }: Props) {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">메모</label>
-            <input value={form.memo} onChange={(e) => setForm({ ...form, memo: e.target.value })}
-              placeholder="6월 레슨비 등"
+            <input value={form.memo} onChange={(e) => setForm({ ...form, memo: e.target.value })} placeholder="6월 레슨비 등"
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500" />
           </div>
         </div>
         <div className="flex items-center justify-between p-5 border-t border-gray-100">
           {payment ? (
-            <button onClick={handleDelete} className="flex items-center gap-1.5 text-sm text-red-500 hover:text-red-600">
-              <Trash2 className="w-4 h-4" />삭제
-            </button>
+            <button onClick={handleDelete} className="flex items-center gap-1.5 text-sm text-red-500 hover:text-red-600"><Trash2 className="w-4 h-4" />삭제</button>
           ) : <div />}
           <div className="flex gap-2">
             <button onClick={onClose} className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg">취소</button>

@@ -4,19 +4,16 @@ import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { X, Trash2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import type { Lesson, Student } from "@/types/database";
-
-type LessonWithStudent = Lesson & { students: Pick<Student, "name"> };
 
 interface Props {
   date: Date;
-  lesson: LessonWithStudent | null;
+  lesson: any;
   onClose: () => void;
   onSaved: () => void;
 }
 
 export default function LessonModal({ date, lesson, onClose, onSaved }: Props) {
-  const [students, setStudents] = useState<Student[]>([]);
+  const [students, setStudents] = useState<any[]>([]);
   const [form, setForm] = useState({
     student_id: lesson?.student_id || "",
     date: lesson?.date || format(date, "yyyy-MM-dd"),
@@ -37,8 +34,7 @@ export default function LessonModal({ date, lesson, onClose, onSaved }: Props) {
   async function handleSave() {
     if (!form.student_id) return alert("학생을 선택해주세요");
     setSaving(true);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const payload: any = {
+    const payload = {
       student_id: form.student_id,
       date: form.date,
       start_time: form.start_time,
@@ -50,7 +46,7 @@ export default function LessonModal({ date, lesson, onClose, onSaved }: Props) {
     if (lesson) {
       await supabase.from("lessons").update(payload).eq("id", lesson.id);
     } else {
-      await supabase.from("lessons").insert(payload);
+      await supabase.from("lessons").insert([payload]);
     }
     setSaving(false);
     onSaved();
@@ -85,12 +81,12 @@ export default function LessonModal({ date, lesson, onClose, onSaved }: Props) {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">시작 시간</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">시작</label>
               <input type="time" value={form.start_time} onChange={(e) => setForm({ ...form, start_time: e.target.value })}
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">종료 시간</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">종료</label>
               <input type="time" value={form.end_time} onChange={(e) => setForm({ ...form, end_time: e.target.value })}
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500" />
             </div>
@@ -108,8 +104,7 @@ export default function LessonModal({ date, lesson, onClose, onSaved }: Props) {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">레슨비 (원)</label>
             <input type="number" value={form.lesson_fee} onChange={(e) => setForm({ ...form, lesson_fee: e.target.value })}
-              placeholder="50000"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500" />
+              placeholder="50000" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">메모</label>
@@ -120,9 +115,7 @@ export default function LessonModal({ date, lesson, onClose, onSaved }: Props) {
         </div>
         <div className="flex items-center justify-between p-5 border-t border-gray-100">
           {lesson ? (
-            <button onClick={handleDelete} className="flex items-center gap-1.5 text-sm text-red-500 hover:text-red-600">
-              <Trash2 className="w-4 h-4" />삭제
-            </button>
+            <button onClick={handleDelete} className="flex items-center gap-1.5 text-sm text-red-500 hover:text-red-600"><Trash2 className="w-4 h-4" />삭제</button>
           ) : <div />}
           <div className="flex gap-2">
             <button onClick={onClose} className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg">취소</button>
