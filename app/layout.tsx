@@ -3,7 +3,7 @@ import "./globals.css";
 import Sidebar from "@/components/ui/Sidebar";
 
 export const metadata: Metadata = {
-  title: "보컬 레슨 스케줄러",
+  title: "레슨 스케줄러",
   description: "보컬 트레이너 레슨 관리 시스템",
 };
 
