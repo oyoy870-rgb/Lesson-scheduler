@@ -38,7 +38,12 @@ export default function LessonModal({ date, lesson, onClose, onSaved }: Props) {
     if (!form.student_id) return alert("학생을 선택해주세요");
     setSaving(true);
     const payload = {
-      ...form,
+      student_id: form.student_id,
+      date: form.date,
+      start_time: form.start_time,
+      end_time: form.end_time,
+      status: form.status as "scheduled" | "completed" | "cancelled" | "no_show",
+      memo: form.memo || null,
       lesson_fee: form.lesson_fee ? parseInt(form.lesson_fee) : null,
     };
     if (lesson) {
