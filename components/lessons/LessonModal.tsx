@@ -37,12 +37,13 @@ export default function LessonModal({ date, lesson, onClose, onSaved }: Props) {
   async function handleSave() {
     if (!form.student_id) return alert("학생을 선택해주세요");
     setSaving(true);
-    const payload = {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const payload: any = {
       student_id: form.student_id,
       date: form.date,
       start_time: form.start_time,
       end_time: form.end_time,
-      status: form.status as "scheduled" | "completed" | "cancelled" | "no_show",
+      status: form.status,
       memo: form.memo || null,
       lesson_fee: form.lesson_fee ? parseInt(form.lesson_fee) : null,
     };
@@ -96,7 +97,7 @@ export default function LessonModal({ date, lesson, onClose, onSaved }: Props) {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">상태</label>
-            <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value as Lesson["status"] })}
+            <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
               <option value="scheduled">예정</option>
               <option value="completed">완료</option>

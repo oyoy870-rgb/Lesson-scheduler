@@ -35,7 +35,14 @@ export default function PaymentModal({ payment, onClose, onSaved }: Props) {
     if (!form.student_id) return alert("학생을 선택해주세요");
     if (!form.amount) return alert("금액을 입력해주세요");
     setSaving(true);
-    const payload = { ...form, amount: parseInt(form.amount) };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const payload: any = {
+      student_id: form.student_id,
+      amount: parseInt(form.amount),
+      payment_date: form.payment_date,
+      payment_method: form.payment_method,
+      memo: form.memo || null,
+    };
     if (payment) {
       await supabase.from("payments").update(payload).eq("id", payment.id);
     } else {
@@ -80,7 +87,7 @@ export default function PaymentModal({ payment, onClose, onSaved }: Props) {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">결제 방법</label>
-            <select value={form.payment_method} onChange={(e) => setForm({ ...form, payment_method: e.target.value as Payment["payment_method"] })}
+            <select value={form.payment_method} onChange={(e) => setForm({ ...form, payment_method: e.target.value })}
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
               <option value="transfer">계좌이체</option>
               <option value="cash">현금</option>
