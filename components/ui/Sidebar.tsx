@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Calendar, Users, CreditCard, Music } from "lucide-react";
+import { Calendar, Users, CreditCard, Music, Sun } from "lucide-react";
 import { clsx } from "clsx";
 
 const navItems = [
+  { href: "/today", label: "오늘 스케줄", icon: Sun },
   { href: "/calendar", label: "캘린더", icon: Calendar },
   { href: "/students", label: "학생 관리", icon: Users },
   { href: "/payments", label: "결제 관리", icon: CreditCard },
@@ -28,16 +29,13 @@ export default function Sidebar() {
       </div>
       <nav className="flex-1 p-4 space-y-1">
         {navItems.map(({ href, label, icon: Icon }) => (
-          <Link
-            key={href}
-            href={href}
+          <Link key={href} href={href}
             className={clsx(
               "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
               pathname.startsWith(href)
                 ? "bg-sky-50 text-sky-700"
                 : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-            )}
-          >
+            )}>
             <Icon className="w-4 h-4" />
             {label}
           </Link>
