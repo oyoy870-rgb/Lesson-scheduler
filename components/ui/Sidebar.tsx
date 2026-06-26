@@ -2,14 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Calendar, Users, CreditCard, Music, Sun } from "lucide-react";
+import { Calendar, Users, Music, Sun } from "lucide-react";
 import { clsx } from "clsx";
 
 const navItems = [
   { href: "/today", label: "오늘 스케줄", icon: Sun },
   { href: "/calendar", label: "캘린더", icon: Calendar },
   { href: "/students", label: "학생 관리", icon: Users },
-  { href: "/payments", label: "결제 관리", icon: CreditCard },
 ];
 
 export default function Sidebar() {

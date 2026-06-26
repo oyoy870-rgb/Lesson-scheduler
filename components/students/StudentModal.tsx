@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { X, Trash2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { X, Trash2, Plus } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 interface Props {
@@ -11,14 +11,36 @@ interface Props {
 }
 
 export default function StudentModal({ student, onClose, onSaved }: Props) {
+  const [categories, setCategories] = useState<string[]>([]);
+  const [newCategory, setNewCategory] = useState("");
+  const [showAddCategory, setShowAddCategory] = useState(false);
   const [form, setForm] = useState({
     name: student?.name || "",
     phone: student?.phone || "",
     email: student?.email || "",
+    category: student?.category || "",
     notes: student?.notes || "",
     is_active: student?.is_active ?? true,
   });
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  async function fetchCategories() {
+    const { data } = await supabase.from("categories").select("name").order("name");
+    if (data) setCategories(data.map((c: any) => c.name));
+  }
+
+  async function handleAddCategory() {
+    if (!newCategory.trim()) return;
+    await supabase.from("categories").insert([{ name: newCategory.trim() }]);
+    setCategories([...categories, newCategory.trim()].sort());
+    setForm({ ...form, category: newCategory.trim() });
+    setNewCategory("");
+    setShowAddCategory(false);
+  }
 
   async function handleSave() {
     if (!form.name.trim()) return alert("이름을 입력해주세요");
@@ -50,6 +72,30 @@ export default function StudentModal({ student, onClose, onSaved }: Props) {
             <label className="block text-sm font-medium text-gray-700 mb-1">이름 *</label>
             <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="홍길동"
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">구분</label>
+            <div className="flex gap-2">
+              <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}
+                className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
+                <option value="">선택 안함</option>
+                {categories.map((c) => <option key={c} value={c}>{c}</option>)}
+              </select>
+              <button onClick={() => setShowAddCategory(!showAddCategory)}
+                className="px-3 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 text-gray-500">
+                <Plus className="w-4 h-4" />
+              </button>
+            </div>
+            {showAddCategory && (
+              <div className="flex gap-2 mt-2">
+                <input value={newCategory} onChange={(e) => setNewCategory(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleAddCategory()}
+                  placeholder="새 구분 추가" autoFocus
+                  className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                <button onClick={handleAddCategory}
+                  className="px-3 py-2 bg-sky-500 text-white rounded-lg text-sm font-medium hover:bg-sky-600">추가</button>
+              </div>
+            )}
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">전화번호</label>
