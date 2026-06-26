@@ -12,7 +12,6 @@ const categoryColors: Record<string, string> = {
   "취미": "bg-green-100 text-green-700",
   "단기": "bg-orange-100 text-orange-700",
 };
-
 function getCategoryColor(cat: string) {
   return categoryColors[cat] || "bg-gray-100 text-gray-600";
 }
@@ -31,7 +30,6 @@ export default function StudentsPage() {
     const { data } = await supabase.from("students").select("*").order("name");
     if (data) setStudents(data);
   }
-
   async function fetchCategories() {
     const { data } = await supabase.from("categories").select("name").order("name");
     if (data) setCategories(data.map((c: any) => c.name));
@@ -44,15 +42,17 @@ export default function StudentsPage() {
   });
 
   return (
-    <div className="p-6">
-      <div className="flex items-center justify-between mb-6">
+    <div className="p-4 md:p-6">
+      <div className="flex items-center justify-between mb-4 md:mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">학생 관리</h1>
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900">학생 관리</h1>
           <p className="text-sm text-gray-500 mt-0.5">총 {students.length}명</p>
         </div>
         <button onClick={() => { setSelectedStudent(null); setIsModalOpen(true); }}
-          className="flex items-center gap-2 px-4 py-2 bg-sky-500 text-white rounded-lg text-sm font-medium hover:bg-sky-600">
-          <Plus className="w-4 h-4" />학생 추가
+          className="flex items-center gap-1.5 px-3 py-2 bg-sky-500 text-white rounded-lg text-sm font-medium hover:bg-sky-600">
+          <Plus className="w-4 h-4" />
+          <span className="hidden sm:inline">학생 추가</span>
+          <span className="sm:hidden">추가</span>
         </button>
       </div>
 
@@ -72,12 +72,12 @@ export default function StudentsPage() {
       <div className="grid gap-3">
         {filtered.map((student) => (
           <div key={student.id} className="bg-white rounded-xl border border-gray-200 p-4 flex items-center justify-between hover:shadow-sm transition-shadow">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-full bg-sky-100 flex items-center justify-center text-sky-700 font-bold text-sm">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-sky-100 flex items-center justify-center text-sky-700 font-bold text-sm flex-shrink-0">
                 {student.name?.[0]}
               </div>
               <div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <p className="font-semibold text-gray-900">{student.name}</p>
                   {student.category && (
                     <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${getCategoryColor(student.category)}`}>
@@ -93,7 +93,7 @@ export default function StudentsPage() {
                 )}
               </div>
             </div>
-            <button onClick={() => { setSelectedStudent(student); setIsModalOpen(true); }} className="p-2 hover:bg-gray-100 rounded-lg">
+            <button onClick={() => { setSelectedStudent(student); setIsModalOpen(true); }} className="p-2 hover:bg-gray-100 rounded-lg flex-shrink-0">
               <Edit2 className="w-4 h-4 text-gray-400" />
             </button>
           </div>

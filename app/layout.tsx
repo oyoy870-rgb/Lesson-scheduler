@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Sidebar from "@/components/ui/Sidebar";
+import MobileNav from "@/components/ui/MobileNav";
 
 export const metadata: Metadata = {
   title: "레슨 스케줄러",
@@ -12,11 +13,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="ko">
       <body>
         <div className="flex h-screen bg-gray-50">
-          <Sidebar />
-          <main className="flex-1 overflow-auto">
+          {/* PC 사이드바 */}
+          <div className="hidden md:flex">
+            <Sidebar />
+          </div>
+          {/* 콘텐츠 */}
+          <main className="flex-1 overflow-auto pb-20 md:pb-0">
             {children}
           </main>
         </div>
+        {/* 모바일 하단 탭바 */}
+        <MobileNav />
       </body>
     </html>
   );

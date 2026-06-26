@@ -16,7 +16,7 @@ type Lesson = {
   end_time: string;
   status: string;
   memo: string | null;
-  lesson_fee: number | null;
+  song: string | null;
   students: { name: string; phone: string | null };
 };
 
@@ -24,12 +24,10 @@ function timeToMinutes(t: string) {
   const [h, m] = t.split(":").map(Number);
   return h * 60 + m;
 }
-
 function nowMinutes() {
   const now = new Date();
   return now.getHours() * 60 + now.getMinutes();
 }
-
 function getLessonState(lesson: Lesson, now: number) {
   if (lesson.status === "completed") return "completed";
   if (lesson.status === "cancelled") return "cancelled";
@@ -42,12 +40,12 @@ function getLessonState(lesson: Lesson, now: number) {
 }
 
 const stateConfig: Record<string, { label: string; color: string; bg: string; border: string; icon: any; dot: string }> = {
-  ongoing:   { label: "진행 중", color: "text-sky-600",   bg: "bg-sky-50",    border: "border-sky-200",  icon: Music,        dot: "bg-sky-500 animate-pulse" },
-  upcoming:  { label: "예정",    color: "text-gray-400",  bg: "bg-white",     border: "border-gray-200", icon: Circle,       dot: "bg-gray-300" },
-  done:      { label: "완료",    color: "text-green-600", bg: "bg-green-50",  border: "border-green-200",icon: CheckCircle2, dot: "bg-green-400" },
-  completed: { label: "완료",    color: "text-green-600", bg: "bg-green-50",  border: "border-green-200",icon: CheckCircle2, dot: "bg-green-400" },
-  cancelled: { label: "취소",    color: "text-gray-400",  bg: "bg-gray-50",   border: "border-gray-200", icon: XCircle,      dot: "bg-gray-300" },
-  no_show:   { label: "노쇼",    color: "text-red-500",   bg: "bg-red-50",    border: "border-red-200",  icon: AlertCircle,  dot: "bg-red-400" },
+  ongoing:   { label: "진행 중", color: "text-sky-600",   bg: "bg-sky-50",   border: "border-sky-200",  icon: Music,        dot: "bg-sky-500 animate-pulse" },
+  upcoming:  { label: "예정",    color: "text-gray-400",  bg: "bg-white",    border: "border-gray-200", icon: Circle,       dot: "bg-gray-300" },
+  done:      { label: "완료",    color: "text-green-600", bg: "bg-green-50", border: "border-green-200",icon: CheckCircle2, dot: "bg-green-400" },
+  completed: { label: "완료",    color: "text-green-600", bg: "bg-green-50", border: "border-green-200",icon: CheckCircle2, dot: "bg-green-400" },
+  cancelled: { label: "취소",    color: "text-gray-400",  bg: "bg-gray-50",  border: "border-gray-200", icon: XCircle,      dot: "bg-gray-300" },
+  no_show:   { label: "노쇼",    color: "text-red-500",   bg: "bg-red-50",   border: "border-red-200",  icon: AlertCircle,  dot: "bg-red-400" },
 };
 
 export default function TodayPage() {
@@ -59,10 +57,7 @@ export default function TodayPage() {
 
   useEffect(() => {
     fetchLessons();
-    const timer = setInterval(() => {
-      setNow(nowMinutes());
-      setCurrentTime(new Date());
-    }, 30000);
+    const timer = setInterval(() => { setNow(nowMinutes()); setCurrentTime(new Date()); }, 30000);
     return () => clearInterval(timer);
   }, []);
 
@@ -75,10 +70,8 @@ export default function TodayPage() {
   async function fetchLessons() {
     const today = format(new Date(), "yyyy-MM-dd");
     const { data } = await supabase
-      .from("lessons")
-      .select("*, students(name, phone)")
-      .eq("date", today)
-      .order("start_time");
+      .from("lessons").select("*, students(name, phone)")
+      .eq("date", today).order("start_time");
     if (data) setLessons(data as Lesson[]);
     setLoading(false);
   }
@@ -90,24 +83,21 @@ export default function TodayPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b border-gray-100 px-6 py-5">
+      <div className="bg-white border-b border-gray-100 px-4 md:px-6 py-4 md:py-5">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs font-medium text-gray-400 uppercase tracking-widest mb-0.5">Today</p>
-            <h1 className="text-2xl font-bold text-gray-900">
+            <h1 className="text-xl md:text-2xl font-bold text-gray-900">
               {format(today, "M월 d일 (E)", { locale: ko })}
             </h1>
           </div>
           <div className="text-right">
-            <p className="text-3xl font-bold text-gray-900 tabular-nums">
+            <p className="text-2xl md:text-3xl font-bold text-gray-900 tabular-nums">
               {format(currentTime, "HH:mm")}
             </p>
-            {ongoingLesson && (
-              <p className="text-xs text-sky-500 font-medium mt-0.5">레슨 진행 중</p>
-            )}
+            {ongoingLesson && <p className="text-xs text-sky-500 font-medium mt-0.5">레슨 진행 중</p>}
           </div>
         </div>
-
         <div className="grid grid-cols-2 gap-3 mt-4">
           <div className="bg-gray-50 rounded-xl p-3 text-center">
             <p className="text-xl font-bold text-gray-900">{totalLessons}</p>
@@ -120,7 +110,7 @@ export default function TodayPage() {
         </div>
       </div>
 
-      <div className="px-6 py-5">
+      <div className="px-4 md:px-6 py-5">
         {loading ? (
           <div className="flex items-center justify-center py-20 text-gray-300">
             <Clock className="w-6 h-6 animate-spin" />
@@ -143,19 +133,18 @@ export default function TodayPage() {
                 const Icon = cfg.icon;
                 const isOngoing = state === "ongoing";
                 const duration = timeToMinutes(lesson.end_time) - timeToMinutes(lesson.start_time);
-
                 return (
-                  <div key={lesson.id} ref={isOngoing ? ongoingRef : null} className="relative flex gap-4">
+                  <div key={lesson.id} ref={isOngoing ? ongoingRef : null} className="relative flex gap-3 md:gap-4">
                     <div className="relative z-10 flex-shrink-0 w-14 flex flex-col items-center pt-3">
                       <div className={`w-3.5 h-3.5 rounded-full ${cfg.dot} ring-2 ring-white`} />
                       <p className="text-xs font-semibold text-gray-500 mt-1 tabular-nums">
                         {lesson.start_time.slice(0, 5)}
                       </p>
                     </div>
-                    <div className={`flex-1 rounded-2xl border ${cfg.border} ${cfg.bg} p-4 mb-1 ${isOngoing ? "shadow-md shadow-sky-100 ring-1 ring-sky-200" : ""}`}>
+                    <div className={`flex-1 rounded-2xl border ${cfg.border} ${cfg.bg} p-3 md:p-4 mb-1 ${isOngoing ? "shadow-md shadow-sky-100 ring-1 ring-sky-200" : ""}`}>
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex items-center gap-2">
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${isOngoing ? "bg-sky-500 text-white" : "bg-white border border-gray-200 text-gray-600"}`}>
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 ${isOngoing ? "bg-sky-500 text-white" : "bg-white border border-gray-200 text-gray-600"}`}>
                             {lesson.students?.name?.[0]}
                           </div>
                           <div>
@@ -166,7 +155,7 @@ export default function TodayPage() {
                             </p>
                           </div>
                         </div>
-                        <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-1 flex-shrink-0">
                           <Icon className={`w-3.5 h-3.5 ${cfg.color}`} />
                           <span className={`text-xs font-semibold ${cfg.color}`}>{cfg.label}</span>
                         </div>
@@ -178,6 +167,12 @@ export default function TodayPage() {
                               style={{ width: `${Math.min(100, ((now - timeToMinutes(lesson.start_time)) / duration) * 100)}%` }} />
                           </div>
                           <p className="text-xs text-sky-400 mt-1">{timeToMinutes(lesson.end_time) - now}분 남음</p>
+                        </div>
+                      )}
+                      {lesson.song && (
+                        <div className="mt-2 flex items-center gap-1.5">
+                          <Music className="w-3 h-3 text-gray-400 flex-shrink-0" />
+                          <p className="text-xs text-gray-500 truncate">{lesson.song}</p>
                         </div>
                       )}
                       {lesson.memo && (
