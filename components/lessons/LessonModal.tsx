@@ -128,7 +128,7 @@ export default function LessonModal({ date, lesson, onClose, onSaved }: Props) {
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-end md:items-center justify-center z-50 p-0 md:p-4">
-      <div className="bg-white rounded-t-3xl md:rounded-2xl w-full md:max-w-md shadow-xl max-h-[92vh] overflow-y-auto">
+      <div className="bg-white rounded-t-3xl md:rounded-2xl w-full md:max-w-md shadow-xl max-h-[calc(92vh-4rem)] md:max-h-[90vh] overflow-y-auto mb-16 md:mb-0">
         {/* 헤더 */}
         <div className="flex items-center justify-between p-5 border-b border-gray-100 sticky top-0 bg-white z-10">
           <h2 className="text-lg font-bold text-gray-900">{lesson ? "레슨 수정" : "레슨 추가"}</h2>
@@ -284,7 +284,7 @@ export default function LessonModal({ date, lesson, onClose, onSaved }: Props) {
         </div>
 
         {/* 하단 버튼 */}
-        <div className="flex items-center justify-between p-5 border-t border-gray-100 sticky bottom-0 bg-white">
+        <div className="flex items-center justify-between p-5 border-t border-gray-100 sticky bottom-0 bg-white pb-[calc(1.25rem+env(safe-area-inset-bottom))] md:pb-5">
           {lesson ? (
             <button onClick={handleDelete} className="flex items-center gap-1.5 text-sm text-red-500 hover:text-red-600">
               <Trash2 className="w-4 h-4" />삭제
